@@ -1,29 +1,40 @@
-My Art Portfolio Website Made with Phantom Template.
-
-	Phantom by HTML5 UP; html5up.net | @ajlkn (Free for personal and commercial use under the CCA 3.0 license (html5up.net/license))
-	
-	This is Phantom, a simple design built around a grid of large, colorful, semi-interactive
-	image tiles (of which you can have as many or as few as you like). Makes use of some
-	SVG and animation techniques I've been experimenting with on that other project of mine
-	you may have heard about (https://carrd.co), and includes a handy generic page for whatever.
-
-	Demo images* courtesy of Unsplash, a radtastic collection of CC0 (public domain) images
-	you can use for pretty much whatever.
-
-	(* = not included)
-
-	AJ
-	aj@lkn.io | @ajlkn
+Prologue by HTML5 UP
+html5up.net | @ajlkn
+Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 
 
-	Credits:
+This is Prologue, a simple, single page responsive site template. It features a
+clean, minimalistic design and a sticky sidebar with navigation-linked scrolling.
 
-		Demo Images:
-			Unsplash (unsplash.com)
+Demo content images* are courtesy of the ridiculously talented Felicia Simion. Check out
+more of her amazing work over at deviantART:
 
-		Icons:
-			Font Awesome (fontawesome.io)
+http://ineedchemicalx.deviantart.com/
 
-		Other:
-			jQuery (jquery.com)
-			Responsive Tools (github.com/ajlkn/responsive-tools)
+(* = Not included! Only meant for use with my own on-site demo, so please do NOT download
+and/or use any of Felicia's work without her explicit permission!)
+
+Demo banner images* courtesy of Unsplash, a radtastic collection of CC0 (public domain)
+images you can use for pretty much whatever.
+
+(* = Not included)
+
+AJ
+aj@lkn.io | @ajlkn
+
+PS: Not sure how to get that contact form working? Give formspree.io a try (it's awesome).
+
+
+Credits:
+
+	Demo Images:
+		Felicia Simion (ineedchemicalx.deviantart.com)
+		Unsplash (unsplash.com)
+
+	Icons:
+		Font Awesome (fontawesome.io)
+
+	Other
+		jQuery (jquery.com)
+		Scrollex (github.com/ajlkn/jquery.scrollex)
+		Responsive Tools (github.com/ajlkn/responsive-tools)

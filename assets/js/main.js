@@ -1,5 +1,5 @@
 /*
-	Phantom by HTML5 UP
+	Prologue by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
@@ -7,16 +7,16 @@
 (function($) {
 
 	var	$window = $(window),
-		$body = $('body');
+		$body = $('body'),
+		$nav = $('#nav');
 
 	// Breakpoints.
 		breakpoints({
-			xlarge:   [ '1281px',  '1680px' ],
-			large:    [ '981px',   '1280px' ],
-			medium:   [ '737px',   '980px'  ],
-			small:    [ '481px',   '736px'  ],
-			xsmall:   [ '361px',   '480px'  ],
-			xxsmall:  [ null,      '360px'  ]
+			wide:      [ '961px',  '1880px' ],
+			normal:    [ '961px',  '1620px' ],
+			narrow:    [ '961px',  '1320px' ],
+			narrower:  [ '737px',  '960px'  ],
+			mobile:    [ null,     '736px'  ]
 		});
 
 	// Play initial animations on page load.
@@ -26,189 +26,98 @@
 			}, 100);
 		});
 
-	// Touch?
-		if (browser.mobile)
-			$body.addClass('is-touch');
+	// Nav.
+		var $nav_a = $nav.find('a');
 
-	// Forms.
-		var $form = $('form');
+		$nav_a
+			.addClass('scrolly')
+			.on('click', function(e) {
 
-		// Auto-resizing textareas.
-			$form.find('textarea').each(function() {
+				var $this = $(this);
 
-				var $this = $(this),
-					$wrapper = $('<div class="textarea-wrapper"></div>'),
-					$submits = $this.find('input[type="submit"]');
-
-				$this
-					.wrap($wrapper)
-					.attr('rows', 1)
-					.css('overflow', 'hidden')
-					.css('resize', 'none')
-					.on('keydown', function(event) {
-
-						if (event.keyCode == 13
-						&&	event.ctrlKey) {
-
-							event.preventDefault();
-							event.stopPropagation();
-
-							$(this).blur();
-
-						}
-
-					})
-					.on('blur focus', function() {
-						$this.val($.trim($this.val()));
-					})
-					.on('input blur focus --init', function() {
-
-						$wrapper
-							.css('height', $this.height());
-
-						$this
-							.css('height', 'auto')
-							.css('height', $this.prop('scrollHeight') + 'px');
-
-					})
-					.on('keyup', function(event) {
-
-						if (event.keyCode == 9)
-							$this
-								.select();
-
-					})
-					.triggerHandler('--init');
-
-				// Fix.
-					if (browser.name == 'ie'
-					||	browser.mobile)
-						$this
-							.css('max-height', '10em')
-							.css('overflow-y', 'auto');
-
-			});
-
-	// Menu.
-		var $menu = $('#menu');
-
-		$menu.wrapInner('<div class="inner"></div>');
-
-		$menu._locked = false;
-
-		$menu._lock = function() {
-
-			if ($menu._locked)
-				return false;
-
-			$menu._locked = true;
-
-			window.setTimeout(function() {
-				$menu._locked = false;
-			}, 350);
-
-			return true;
-
-		};
-
-		$menu._show = function() {
-
-			if ($menu._lock())
-				$body.addClass('is-menu-visible');
-
-		};
-
-		$menu._hide = function() {
-
-			if ($menu._lock())
-				$body.removeClass('is-menu-visible');
-
-		};
-
-		$menu._toggle = function() {
-
-			if ($menu._lock())
-				$body.toggleClass('is-menu-visible');
-
-		};
-
-		$menu
-			.appendTo($body)
-			.on('click', function(event) {
-				event.stopPropagation();
-			})
-			.on('click', 'a', function(event) {
-
-				var href = $(this).attr('href');
-
-				event.preventDefault();
-				event.stopPropagation();
-
-				// Hide.
-					$menu._hide();
-
-				// Redirect.
-					if (href == '#menu')
+				// External link? Bail.
+					if ($this.attr('href').charAt(0) != '#')
 						return;
 
-					window.setTimeout(function() {
-						window.location.href = href;
-					}, 350);
+				// Prevent default.
+					e.preventDefault();
+
+				// Deactivate all links.
+					$nav_a.removeClass('active');
+
+				// Activate link *and* lock it (so Scrollex doesn't try to activate other links as we're scrolling to this one's section).
+					$this
+						.addClass('active')
+						.addClass('active-locked');
 
 			})
-			.append('<a class="close" href="#menu">Close</a>');
+			.each(function() {
 
-		$body
-			.on('click', 'a[href="#menu"]', function(event) {
+				var	$this = $(this),
+					id = $this.attr('href'),
+					$section = $(id);
 
-				event.stopPropagation();
-				event.preventDefault();
+				// No section for this link? Bail.
+					if ($section.length < 1)
+						return;
 
-				// Toggle.
-					$menu._toggle();
+				// Scrollex.
+					$section.scrollex({
+						mode: 'middle',
+						top: '-10vh',
+						bottom: '-10vh',
+						initialize: function() {
 
-			})
-			.on('click', function(event) {
+							// Deactivate section.
+								$section.addClass('inactive');
 
-				// Hide.
-					$menu._hide();
+						},
+						enter: function() {
 
-			})
-			.on('keydown', function(event) {
+							// Activate section.
+								$section.removeClass('inactive');
 
-				// Hide on escape.
-					if (event.keyCode == 27)
-						$menu._hide();
+							// No locked links? Deactivate all links and activate this section's one.
+								if ($nav_a.filter('.active-locked').length == 0) {
+
+									$nav_a.removeClass('active');
+									$this.addClass('active');
+
+								}
+
+							// Otherwise, if this section's link is the one that's locked, unlock it.
+								else if ($this.hasClass('active-locked'))
+									$this.removeClass('active-locked');
+
+						}
+					});
 
 			});
 
-    // Get the modal
-    var modal = document.getElementById("myModal");
-    // to all images -- note I'm using a class!
-    var images = document.getElementsByClassName('myImages');
-    // Get the image and insert it inside the modal - use its "alt" text as a caption
-    var img = document.getElementById("myImg");
-    var modalImg = document.getElementById("img01");
-    var captionText = document.getElementById("caption");
-    
+	// Scrolly.
+		$('.scrolly').scrolly();
 
-    // Go through all of the images with our custom class
-    for (var i = 0; i < images.length; i++) {
-        var img = images[i];
-        // and attach our click listener for this image.
-        img.onclick = function(evt) {
-            modal.style.display = "block";
-            modalImg.src = this.src;
-            captionText.innerHTML = this.alt;
-        }
-    }
+	// Header (narrower + mobile).
 
-    // Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("close")[0];
+		// Toggle.
+			$(
+				'<div id="headerToggle">' +
+					'<a href="#header" class="toggle"></a>' +
+				'</div>'
+			)
+				.appendTo($body);
 
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
+		// Header.
+			$('#header')
+				.panel({
+					delay: 500,
+					hideOnClick: true,
+					hideOnSwipe: true,
+					resetScroll: true,
+					resetForms: true,
+					side: 'left',
+					target: $body,
+					visibleClass: 'header-visible'
+				});
 
 })(jQuery);
