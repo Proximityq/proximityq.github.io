@@ -1,0 +1,20 @@
+html {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+}
+
+canvas {
+  display: block;
+  padding: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  
+}

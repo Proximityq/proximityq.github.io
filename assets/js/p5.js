@@ -1,4 +1,4 @@
-/*! p5.js v1.11.11 October 20, 2025 */
+/*! p5.js v1.11.13 April 08, 2026 */
 (function (f) {
   if (typeof exports === 'object' && typeof module !== 'undefined') {
     module.exports = f()
@@ -54995,7 +54995,7 @@
  * a CSS color string.
  *
  * By default, `blue()` returns a color's blue value in the range 0
- * to 255. If the <a href="#/colorMode">colorMode()</a> is set to RGB, it
+ * to 255. If the <a href="#/p5/colorMode">colorMode()</a> is set to RGB, it
  * returns the blue value in the given range.
  *
  * @method blue
@@ -55130,7 +55130,7 @@
  * a CSS color string.
  *
  * By default, `brightness()` returns a color's HSB brightness in the range 0
- * to 100. If the <a href="#/colorMode">colorMode()</a> is set to HSB, it
+ * to 100. If the <a href="#/p5/colorMode">colorMode()</a> is set to HSB, it
  * returns the brightness value in the given range.
  *
  * @method brightness
@@ -55565,7 +55565,7 @@
  * a CSS color string.
  *
  * By default, `green()` returns a color's green value in the range 0
- * to 255. If the <a href="#/colorMode">colorMode()</a> is set to RGB, it
+ * to 255. If the <a href="#/p5/colorMode">colorMode()</a> is set to RGB, it
  * returns the green value in the given range.
  *
  * @method green
@@ -55701,7 +55701,7 @@
  *
  * Hue describes a color's position on the color wheel. By default, `hue()`
  * returns a color's HSL hue in the range 0 to 360. If the
- * <a href="#/colorMode">colorMode()</a> is set to HSB or HSL, it returns the hue
+ * <a href="#/p5/colorMode">colorMode()</a> is set to HSB or HSL, it returns the hue
  * value in the given mode.
  *
  * @method hue
@@ -55953,7 +55953,7 @@
  * distance to both.
  *
  * The way that colors are interpolated depends on the current
- * <a href="#/colorMode">colorMode()</a>.
+ * <a href="#/p5/colorMode">colorMode()</a>.
  *
  * @method paletteLerp
  * @param  {[p5.Color, Number][]} colors_stops color stops to interpolate from
@@ -55999,7 +55999,7 @@
  * a CSS color string.
  *
  * By default, `lightness()` returns a color's HSL lightness in the range 0
- * to 100. If the <a href="#/colorMode">colorMode()</a> is set to HSL, it
+ * to 100. If the <a href="#/p5/colorMode">colorMode()</a> is set to HSL, it
  * returns the lightness value in the given range.
  *
  * @method lightness
@@ -56143,7 +56143,7 @@
  * a CSS color string.
  *
  * By default, `red()` returns a color's red value in the range 0
- * to 255. If the <a href="#/colorMode">colorMode()</a> is set to RGB, it
+ * to 255. If the <a href="#/p5/colorMode">colorMode()</a> is set to RGB, it
  * returns the red value in the given range.
  *
  * @method red
@@ -56279,7 +56279,7 @@
  *
  * Saturation is scaled differently in HSB and HSL. By default, `saturation()`
  * returns a color's HSL saturation in the range 0 to 100. If the
- * <a href="#/colorMode">colorMode()</a> is set to HSB or HSL, it returns the
+ * <a href="#/p5/colorMode">colorMode()</a> is set to HSB or HSL, it returns the
  * saturation value in the given mode.
  *
  * @method saturation
@@ -59397,7 +59397,7 @@
  * @property {String} VERSION
  * @final
  */
-        var VERSION = '1.11.11';
+        var VERSION = '1.11.13';
         // GRAPHICS RENDERER
         /**
  * The default, two-dimensional renderer.
@@ -68544,6 +68544,11 @@
             {
               key: 'remove',
               value: function remove() {
+                // Clean up WebGL resources if the renderer has a remove method
+                // (WebGL renderers need to free GPU resources like shaders and textures)
+                if (this._renderer && typeof this._renderer.remove === 'function') {
+                  this._renderer.remove();
+                }
                 if (this.elt.parentNode) {
                   this.elt.parentNode.removeChild(this.elt);
                 }
@@ -71409,7 +71414,7 @@
  * <div>
  * <code>
  * function setup() {
- *   // Create a p5.Render object.
+ *   // Create a p5.Renderer object.
  *   let cnv = createCanvas(50, 50);
  *
  *   // Position the canvas.
@@ -73406,6 +73411,11 @@
  *
  *   background(200);
  *
+ *
+ *   // Making point to 5 pixels
+ *   strokeWeight(5);
+ *
+ *
  *   // Top-left.
  *   point(30, 20);
  *
@@ -73431,6 +73441,11 @@
  *   createCanvas(100, 100);
  *
  *   background(200);
+ *
+ *
+ *   // Making point to 5 pixels.
+ *   strokeWeight(5);
+ *
  *
  *   // Top-left.
  *   point(30, 20);
@@ -73461,6 +73476,11 @@
  *   createCanvas(100, 100);
  *
  *   background(200);
+ *
+ *
+ *   // Making point to 5 pixels.
+ *   strokeWeight(5);
+ *
  *
  *   // Top-left.
  *   let a = createVector(30, 20);
@@ -111048,7 +111068,7 @@
     * @static
     * @param  {p5.Vector} v1 first <a href="#/p5.Vector">p5.Vector</a>.
     * @param  {p5.Vector} v2 second <a href="#/p5.Vector">p5.Vector</a>.
-    * @return {Number}     cross product.
+    * @return {p5.Vector}    cross product.
     */
 
             },
@@ -119486,7 +119506,7 @@
             planeGeom.computeFaces().computeNormals();
             if (detailX <= 1 && detailY <= 1) {
               planeGeom._makeTriangleEdges()._edgesToVertices();
-            } else if (this._renderer._doStroke) {
+            } else if (this._renderer._doStroke && !this._renderer.geometryBuilder) {
               console.log('Cannot draw stroke on plane objects with more' + ' than 1 detailX or 1 detailY');
             }
             this._renderer.createBuffers(gId, planeGeom);
@@ -119760,7 +119780,7 @@
             boxGeom.computeNormals();
             if (detailX <= 4 && detailY <= 4) {
               boxGeom._edgesToVertices();
-            } else if (this._renderer._doStroke) {
+            } else if (this._renderer._doStroke && !this._renderer.geometryBuilder) {
               console.log('Cannot draw stroke on box objects with more' + ' than 4 detailX or 4 detailY');
             }            //initialize our geometry buffer with
             //the key val pair:
@@ -120230,7 +120250,7 @@
             // normals are computed in call to _truncatedCone
             if (detailX <= 24 && detailY <= 16) {
               cylinderGeom._makeTriangleEdges()._edgesToVertices();
-            } else if (this._renderer._doStroke) {
+            } else if (this._renderer._doStroke && !this._renderer.geometryBuilder) {
               console.log('Cannot draw stroke on cylinder objects with more' + ' than 24 detailX or 16 detailY');
             }
             this._renderer.createBuffers(gId, cylinderGeom);
@@ -120457,7 +120477,7 @@
             _truncatedCone.call(coneGeom, 1, 0, 1, detailX, detailY, cap, false);
             if (detailX <= 24 && detailY <= 16) {
               coneGeom._makeTriangleEdges()._edgesToVertices();
-            } else if (this._renderer._doStroke) {
+            } else if (this._renderer._doStroke && !this._renderer.geometryBuilder) {
               console.log('Cannot draw stroke on cone objects with more' + ' than 24 detailX or 16 detailY');
             }
             this._renderer.createBuffers(gId, coneGeom);
@@ -120665,7 +120685,7 @@
             ellipsoidGeom.computeFaces();
             if (detailX <= 24 && detailY <= 24) {
               ellipsoidGeom._makeTriangleEdges()._edgesToVertices();
-            } else if (this._renderer._doStroke) {
+            } else if (this._renderer._doStroke && !this._renderer.geometryBuilder) {
               console.log('Cannot draw stroke on ellipsoids with more' + ' than 24 detailX or 24 detailY');
             }
             this._renderer.createBuffers(gId, ellipsoidGeom);
@@ -120869,7 +120889,7 @@
             torusGeom.computeFaces();
             if (detailX <= 24 && detailY <= 16) {
               torusGeom._makeTriangleEdges()._edgesToVertices();
-            } else if (this._renderer._doStroke) {
+            } else if (this._renderer._doStroke && !this._renderer.geometryBuilder) {
               console.log('Cannot draw strokes on torus object with more' + ' than 24 detailX or 16 detailY');
             }
             this._renderer.createBuffers(gId, torusGeom);
@@ -125664,11 +125684,10 @@
                     // Now, convert the given token into an index
                     var vertString = tokens[vertexTokens[tokenInd]];
                     var vertParts = vertString.split('/');
-                    // TODO: Faces can technically use negative numbers to refer to the
-                    // previous nth vertex. I haven't seen this used in practice, but
-                    // it might be good to implement this in the future.
                     for (var i = 0; i < vertParts.length; i++) {
-                      vertParts[i] = parseInt(vertParts[i]) - 1;
+                      var index = parseInt(vertParts[i]);
+                      if (index > 0) index -= 1; // OBJ uses 1-based indexing
+                      vertParts[i] = index;
                     }
                     if (!usedVerts[vertString]) {
                       usedVerts[vertString] = {
@@ -125676,17 +125695,17 @@
                     }
                     if (usedVerts[vertString][currentMaterial] === undefined) {
                       var vertIndex = model.vertices.length;
-                      model.vertices.push(loadedVerts.v[vertParts[0]].copy());
-                      model.uvs.push(loadedVerts.vt[vertParts[1]] ? loadedVerts.vt[vertParts[1]].slice() : [
+                      model.vertices.push(loadedVerts.v.at(vertParts[0]).copy());
+                      model.uvs.push(loadedVerts.vt.at(vertParts[1]) ? loadedVerts.vt.at(vertParts[1]).slice() : [
                         0,
                         0
                       ]);
-                      model.vertexNormals.push(loadedVerts.vn[vertParts[2]] ? loadedVerts.vn[vertParts[2]].copy() : new _main.default.Vector());
+                      model.vertexNormals.push(loadedVerts.vn.at(vertParts[2]) ? loadedVerts.vn.at(vertParts[2]).copy() : new _main.default.Vector());
                       usedVerts[vertString][currentMaterial] = vertIndex;
                       face.push(vertIndex);
                       if (currentMaterial && materials[currentMaterial] && materials[currentMaterial].diffuseColor) {
                         // Mark this vertex as colored
-                        coloredVerts.add(loadedVerts.v[vertParts[0]]); //since a set would only push unique values
+                        coloredVerts.add(loadedVerts.v.at(vertParts[0])); //since a set would only push unique values
                       }
                     } else {
                       face.push(usedVerts[vertString][currentMaterial]);
@@ -140980,14 +140999,49 @@
             gl.drawArrays(drawMode || gl.TRIANGLES, 0, buffers.vertexCount);
           }
         };
-        _main.default.RendererGL.prototype._drawPoints = function (vertices, vertexBuffer) {
+        _main.default.RendererGL.prototype._drawPoints = function (vertices, pointBuffers) {
           var gl = this.GL;
           var pointShader = this._getImmediatePointShader();
-          this._setPointUniforms(pointShader);
-          this._bindBuffer(vertexBuffer, gl.ARRAY_BUFFER, this._vToNArray(vertices), Float32Array, gl.STATIC_DRAW);
-          pointShader.enableAttrib(pointShader.attributes.aPosition, 3);
+          if (Array.isArray(pointBuffers)) {
+            var geom = this.immediateMode.geometry;
+            if (geom.vertices !== vertices) {
+              geom.vertices = vertices;
+              geom.dirtyFlags.vertices = true;
+              if (geom.vertexStrokeColors.length > 0) {
+                geom.vertexStrokeColors.length = 0;
+                geom.dirtyFlags.vertexStrokeColors = true;
+              }
+            }
+            this._setPointUniforms(pointShader);
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
+            try {
+              for (var _iterator4 = pointBuffers[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                var buff = _step4.value;
+                buff._prepareBuffer(geom, pointShader);
+              }
+            } catch (err) {
+              _didIteratorError4 = true;
+              _iteratorError4 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+                  _iterator4.return();
+                }
+              } finally {
+                if (_didIteratorError4) {
+                  throw _iteratorError4;
+                }
+              }
+            }
+          } else {
+            this._setPointUniforms(pointShader);
+            this._bindBuffer(pointBuffers, gl.ARRAY_BUFFER, this._vToNArray(vertices), Float32Array, gl.STATIC_DRAW);
+            pointShader.enableAttrib(pointShader.attributes.aPosition, 3);
+          }
           this._applyColorBlend(this.curStrokeColor);
-          gl.drawArrays(gl.Points, 0, vertices.length);
+          gl.drawArrays(gl.POINTS, 0, vertices.length);
           pointShader.unbindShader();
         };
         var _default = _main.default.RendererGL;
@@ -141417,8 +141471,8 @@
           fontFrag: '#ifndef WEBGL2\n#extension GL_OES_standard_derivatives : enable\n#endif\n\n#if 0\n  // simulate integer math using floats\n\t#define int float\n\t#define ivec2 vec2\n\t#define INT(x) float(x)\n\n\tint ifloor(float v) { return floor(v); }\n\tivec2 ifloor(vec2 v) { return floor(v); }\n\n#else\n  // use native integer math\n\tprecision highp int;\n\t#define INT(x) x\n\n\tint ifloor(float v) { return int(v); }\n\tint ifloor(int v) { return v; }\n\tivec2 ifloor(vec2 v) { return ivec2(v); }\n\n#endif\n\nuniform sampler2D uSamplerStrokes;\nuniform sampler2D uSamplerRowStrokes;\nuniform sampler2D uSamplerRows;\nuniform sampler2D uSamplerColStrokes;\nuniform sampler2D uSamplerCols;\n\nuniform ivec2 uStrokeImageSize;\nuniform ivec2 uCellsImageSize;\nuniform ivec2 uGridImageSize;\n\nuniform ivec2 uGridOffset;\nuniform ivec2 uGridSize;\nuniform vec4 uMaterialColor;\n\nIN vec2 vTexCoord;\n\n// some helper functions\nint ROUND(float v) { return ifloor(v + 0.5); }\nivec2 ROUND(vec2 v) { return ifloor(v + 0.5); }\nfloat saturate(float v) { return clamp(v, 0.0, 1.0); }\nvec2 saturate(vec2 v) { return clamp(v, 0.0, 1.0); }\n\nint mul(float v1, int v2) {\n  return ifloor(v1 * float(v2));\n}\n\nivec2 mul(vec2 v1, ivec2 v2) {\n  return ifloor(v1 * vec2(v2) + 0.5);\n}\n\n// unpack a 16-bit integer from a float vec2\nint getInt16(vec2 v) {\n  ivec2 iv = ROUND(v * 255.0);\n  return iv.x * INT(128) + iv.y;\n}\n\nvec2 pixelScale;\nvec2 coverage = vec2(0.0);\nvec2 weight = vec2(0.5);\nconst float minDistance = 1.0/8192.0;\nconst float hardness = 1.05; // amount of antialias\n\n// the maximum number of curves in a glyph\nconst int N = INT(250);\n\n// retrieves an indexed pixel from a sampler\nvec4 getTexel(sampler2D sampler, int pos, ivec2 size) {\n  int width = size.x;\n  int y = ifloor(pos / width);\n  int x = pos - y * width;  // pos % width\n\n  return TEXTURE(sampler, (vec2(x, y) + 0.5) / vec2(size));\n}\n\nvoid calulateCrossings(vec2 p0, vec2 p1, vec2 p2, out vec2 C1, out vec2 C2) {\n\n  // get the coefficients of the quadratic in t\n  vec2 a = p0 - p1 * 2.0 + p2;\n  vec2 b = p0 - p1;\n  vec2 c = p0 - vTexCoord;\n\n  // found out which values of \'t\' it crosses the axes\n  vec2 surd = sqrt(max(vec2(0.0), b * b - a * c));\n  vec2 t1 = ((b - surd) / a).yx;\n  vec2 t2 = ((b + surd) / a).yx;\n\n  // approximate straight lines to avoid rounding errors\n  if (abs(a.y) < 0.001)\n    t1.x = t2.x = c.y / (2.0 * b.y);\n\n  if (abs(a.x) < 0.001)\n    t1.y = t2.y = c.x / (2.0 * b.x);\n\n  // plug into quadratic formula to find the corrdinates of the crossings\n  C1 = ((a * t1 - b * 2.0) * t1 + c) * pixelScale;\n  C2 = ((a * t2 - b * 2.0) * t2 + c) * pixelScale;\n}\n\nvoid coverageX(vec2 p0, vec2 p1, vec2 p2) {\n\n  vec2 C1, C2;\n  calulateCrossings(p0, p1, p2, C1, C2);\n\n  // determine on which side of the x-axis the points lie\n  bool y0 = p0.y > vTexCoord.y;\n  bool y1 = p1.y > vTexCoord.y;\n  bool y2 = p2.y > vTexCoord.y;\n\n  // could web be under the curve (after t1)?\n  if (y1 ? !y2 : y0) {\n    // add the coverage for t1\n    coverage.x += saturate(C1.x + 0.5);\n    // calculate the anti-aliasing for t1\n    weight.x = min(weight.x, abs(C1.x));\n  }\n\n  // are we outside the curve (after t2)?\n  if (y1 ? !y0 : y2) {\n    // subtract the coverage for t2\n    coverage.x -= saturate(C2.x + 0.5);\n    // calculate the anti-aliasing for t2\n    weight.x = min(weight.x, abs(C2.x));\n  }\n}\n\n// this is essentially the same as coverageX, but with the axes swapped\nvoid coverageY(vec2 p0, vec2 p1, vec2 p2) {\n\n  vec2 C1, C2;\n  calulateCrossings(p0, p1, p2, C1, C2);\n\n  bool x0 = p0.x > vTexCoord.x;\n  bool x1 = p1.x > vTexCoord.x;\n  bool x2 = p2.x > vTexCoord.x;\n\n  if (x1 ? !x2 : x0) {\n    coverage.y -= saturate(C1.y + 0.5);\n    weight.y = min(weight.y, abs(C1.y));\n  }\n\n  if (x1 ? !x0 : x2) {\n    coverage.y += saturate(C2.y + 0.5);\n    weight.y = min(weight.y, abs(C2.y));\n  }\n}\n\nvoid main() {\n\n  // calculate the pixel scale based on screen-coordinates\n  pixelScale = hardness / fwidth(vTexCoord);\n\n  // which grid cell is this pixel in?\n  ivec2 gridCoord = ifloor(vTexCoord * vec2(uGridSize));\n\n  // intersect curves in this row\n  {\n    // the index into the row info bitmap\n    int rowIndex = gridCoord.y + uGridOffset.y;\n    // fetch the info texel\n    vec4 rowInfo = getTexel(uSamplerRows, rowIndex, uGridImageSize);\n    // unpack the rowInfo\n    int rowStrokeIndex = getInt16(rowInfo.xy);\n    int rowStrokeCount = getInt16(rowInfo.zw);\n\n    for (int iRowStroke = INT(0); iRowStroke < N; iRowStroke++) {\n      if (iRowStroke >= rowStrokeCount)\n        break;\n\n      // each stroke is made up of 3 points: the start and control point\n      // and the start of the next curve.\n      // fetch the indices of this pair of strokes:\n      vec4 strokeIndices = getTexel(uSamplerRowStrokes, rowStrokeIndex++, uCellsImageSize);\n\n      // unpack the stroke index\n      int strokePos = getInt16(strokeIndices.xy);\n\n      // fetch the two strokes\n      vec4 stroke0 = getTexel(uSamplerStrokes, strokePos + INT(0), uStrokeImageSize);\n      vec4 stroke1 = getTexel(uSamplerStrokes, strokePos + INT(1), uStrokeImageSize);\n\n      // calculate the coverage\n      coverageX(stroke0.xy, stroke0.zw, stroke1.xy);\n    }\n  }\n\n  // intersect curves in this column\n  {\n    int colIndex = gridCoord.x + uGridOffset.x;\n    vec4 colInfo = getTexel(uSamplerCols, colIndex, uGridImageSize);\n    int colStrokeIndex = getInt16(colInfo.xy);\n    int colStrokeCount = getInt16(colInfo.zw);\n    \n    for (int iColStroke = INT(0); iColStroke < N; iColStroke++) {\n      if (iColStroke >= colStrokeCount)\n        break;\n\n      vec4 strokeIndices = getTexel(uSamplerColStrokes, colStrokeIndex++, uCellsImageSize);\n\n      int strokePos = getInt16(strokeIndices.xy);\n      vec4 stroke0 = getTexel(uSamplerStrokes, strokePos + INT(0), uStrokeImageSize);\n      vec4 stroke1 = getTexel(uSamplerStrokes, strokePos + INT(1), uStrokeImageSize);\n      coverageY(stroke0.xy, stroke0.zw, stroke1.xy);\n    }\n  }\n\n  weight = saturate(1.0 - weight * 2.0);\n  float distance = max(weight.x + weight.y, minDistance); // manhattan approx.\n  float antialias = abs(dot(coverage, weight) / distance);\n  float cover = min(abs(coverage.x), abs(coverage.y));\n  OUT_COLOR = vec4(uMaterialColor.rgb, 1.) * uMaterialColor.a;\n  OUT_COLOR *= saturate(max(antialias, cover));\n}\n',
           lineVert: lineDefs + '/*\n  Part of the Processing project - http://processing.org\n  Copyright (c) 2012-15 The Processing Foundation\n  Copyright (c) 2004-12 Ben Fry and Casey Reas\n  Copyright (c) 2001-04 Massachusetts Institute of Technology\n  This library is free software; you can redistribute it and/or\n  modify it under the terms of the GNU Lesser General Public\n  License as published by the Free Software Foundation, version 2.1.\n  This library is distributed in the hope that it will be useful,\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n  Lesser General Public License for more details.\n  You should have received a copy of the GNU Lesser General\n  Public License along with this library; if not, write to the\n  Free Software Foundation, Inc., 59 Temple Place, Suite 330,\n  Boston, MA  02111-1307  USA\n*/\n\n#define PROCESSING_LINE_SHADER\n\nprecision highp int;\nprecision highp float;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform float uStrokeWeight;\n\nuniform bool uUseLineColor;\nuniform vec4 uMaterialColor;\n\nuniform vec4 uViewport;\nuniform int uPerspective;\nuniform int uStrokeJoin;\n\nIN vec4 aPosition;\nIN vec3 aTangentIn;\nIN vec3 aTangentOut;\nIN float aSide;\nIN vec4 aVertexColor;\n\nOUT vec4 vColor;\nOUT vec2 vTangent;\nOUT vec2 vCenter;\nOUT vec2 vPosition;\nOUT float vMaxDist;\nOUT float vCap;\nOUT float vJoin;\nOUT float vStrokeWeight;\n\nvec2 lineIntersection(vec2 aPoint, vec2 aDir, vec2 bPoint, vec2 bDir) {\n  // Rotate and translate so a starts at the origin and goes out to the right\n  bPoint -= aPoint;\n  vec2 rotatedBFrom = vec2(\n    bPoint.x*aDir.x + bPoint.y*aDir.y,\n    bPoint.y*aDir.x - bPoint.x*aDir.y\n  );\n  vec2 bTo = bPoint + bDir;\n  vec2 rotatedBTo = vec2(\n    bTo.x*aDir.x + bTo.y*aDir.y,\n    bTo.y*aDir.x - bTo.x*aDir.y\n  );\n  float intersectionDistance =\n    rotatedBTo.x + (rotatedBFrom.x - rotatedBTo.x) * rotatedBTo.y /\n    (rotatedBTo.y - rotatedBFrom.y);\n  return aPoint + aDir * intersectionDistance;\n}\n\nvoid main() {\n  HOOK_beforeVertex();\n  // Caps have one of either the in or out tangent set to 0\n  vCap = (aTangentIn == vec3(0.)) != (aTangentOut == (vec3(0.)))\n    ? 1. : 0.;\n\n  // Joins have two unique, defined tangents\n  vJoin = (\n    aTangentIn != vec3(0.) &&\n    aTangentOut != vec3(0.) &&\n    aTangentIn != aTangentOut\n  ) ? 1. : 0.;\n\n  vec4 localPosition = vec4(HOOK_getLocalPosition(aPosition.xyz), 1.);\n  vec4 posp = vec4(HOOK_getWorldPosition((uModelViewMatrix * localPosition).xyz), 1.);\n  vec4 posqIn = posp + uModelViewMatrix * vec4(aTangentIn, 0);\n  vec4 posqOut = posp + uModelViewMatrix * vec4(aTangentOut, 0);\n  float strokeWeight = HOOK_getStrokeWeight(uStrokeWeight);\n  vStrokeWeight = strokeWeight;\n\n  float facingCamera = pow(\n    // The word space tangent\'s z value is 0 if it\'s facing the camera\n    abs(normalize(posqIn-posp).z),\n\n    // Using pow() here to ramp `facingCamera` up from 0 to 1 really quickly\n    // so most lines get scaled and don\'t get clipped\n    0.25\n  );\n\n  // Moving vertices slightly toward the camera\n  // to avoid depth-fighting with the fill triangles.\n  // A mix of scaling and offsetting is used based on distance\n  // Discussion here:\n  // https://github.com/processing/p5.js/issues/7200 \n\n  // using a scale <1 moves the lines towards nearby camera\n  // in order to prevent popping effects due to half of\n  // the line disappearing behind the geometry faces.\n  float zDistance = -posp.z; \n  float distanceFactor = smoothstep(0.0, 800.0, zDistance); \n  \n  // Discussed here:\n  // http://www.opengl.org/discussion_boards/ubbthreads.php?ubb=showflat&Number=252848  \n  float scale = mix(1., 0.995, facingCamera);\n  float dynamicScale = mix(scale, 1.0, distanceFactor); // Closer = more scale, farther = less\n\n  posp.xyz = posp.xyz * dynamicScale;\n  posqIn.xyz = posqIn.xyz * dynamicScale;\n  posqOut.xyz = posqOut.xyz * dynamicScale;\n\n  // Moving vertices slightly toward camera when far away \n  // https://github.com/processing/p5.js/issues/6956 \n  float zOffset = mix(0., -1., facingCamera);\n  float dynamicZAdjustment = mix(0.0, zOffset, distanceFactor); // Closer = less zAdjustment, farther = more\n\n  posp.z -= dynamicZAdjustment;\n  posqIn.z -= dynamicZAdjustment;\n  posqOut.z -= dynamicZAdjustment;\n  \n  vec4 p = uProjectionMatrix * posp;\n  vec4 qIn = uProjectionMatrix * posqIn;\n  vec4 qOut = uProjectionMatrix * posqOut;\n  vCenter = HOOK_getLineCenter(p.xy);\n\n  // formula to convert from clip space (range -1..1) to screen space (range 0..[width or height])\n  // screen_p = (p.xy/p.w + <1,1>) * 0.5 * uViewport.zw\n\n  // prevent division by W by transforming the tangent formula (div by 0 causes\n  // the line to disappear, see https://github.com/processing/processing/issues/5183)\n  // t = screen_q - screen_p\n  //\n  // tangent is normalized and we don\'t care which aDirection it points to (+-)\n  // t = +- normalize( screen_q - screen_p )\n  // t = +- normalize( (q.xy/q.w+<1,1>)*0.5*uViewport.zw - (p.xy/p.w+<1,1>)*0.5*uViewport.zw )\n  //\n  // extract common factor, <1,1> - <1,1> cancels out\n  // t = +- normalize( (q.xy/q.w - p.xy/p.w) * 0.5 * uViewport.zw )\n  //\n  // convert to common divisor\n  // t = +- normalize( ((q.xy*p.w - p.xy*q.w) / (p.w*q.w)) * 0.5 * uViewport.zw )\n  //\n  // remove the common scalar divisor/factor, not needed due to normalize and +-\n  // (keep uViewport - can\'t remove because it has different components for x and y\n  //  and corrects for aspect ratio, see https://github.com/processing/processing/issues/5181)\n  // t = +- normalize( (q.xy*p.w - p.xy*q.w) * uViewport.zw )\n\n  vec2 tangentIn = normalize((qIn.xy*p.w - p.xy*qIn.w) * uViewport.zw);\n  vec2 tangentOut = normalize((qOut.xy*p.w - p.xy*qOut.w) * uViewport.zw);\n\n  vec2 curPerspScale;\n  if(uPerspective == 1) {\n    // Perspective ---\n    // convert from world to clip by multiplying with projection scaling factor\n    // to get the right thickness (see https://github.com/processing/processing/issues/5182)\n\n    // The y value of the projection matrix may be flipped if rendering to a Framebuffer.\n    // Multiplying again by its sign here negates the flip to get just the scale.\n    curPerspScale = (uProjectionMatrix * vec4(1, sign(uProjectionMatrix[1][1]), 0, 0)).xy;\n  } else {\n    // No Perspective ---\n    // multiply by W (to cancel out division by W later in the pipeline) and\n    // convert from screen to clip (derived from clip to screen above)\n    curPerspScale = p.w / (0.5 * uViewport.zw);\n  }\n\n  vec2 offset;\n  if (vJoin == 1.) {\n    vTangent = normalize(tangentIn + tangentOut);\n    vec2 normalIn = vec2(-tangentIn.y, tangentIn.x);\n    vec2 normalOut = vec2(-tangentOut.y, tangentOut.x);\n    float side = sign(aSide);\n    float sideEnum = abs(aSide);\n\n    // We generate vertices for joins on either side of the centerline, but\n    // the "elbow" side is the only one needing a join. By not setting the\n    // offset for the other side, all its vertices will end up in the same\n    // spot and not render, effectively discarding it.\n    if (sign(dot(tangentOut, vec2(-tangentIn.y, tangentIn.x))) != side) {\n      // Side enums:\n      //   1: the side going into the join\n      //   2: the middle of the join\n      //   3: the side going out of the join\n      if (sideEnum == 2.) {\n        // Calculate the position + tangent on either side of the join, and\n        // find where the lines intersect to find the elbow of the join\n        vec2 c = (posp.xy/posp.w + vec2(1.,1.)) * 0.5 * uViewport.zw;\n        vec2 intersection = lineIntersection(\n          c + (side * normalIn * strokeWeight / 2.),\n          tangentIn,\n          c + (side * normalOut * strokeWeight / 2.),\n          tangentOut\n        );\n        offset = (intersection - c);\n\n        // When lines are thick and the angle of the join approaches 180, the\n        // elbow might be really far from the center. We\'ll apply a limit to\n        // the magnitude to avoid lines going across the whole screen when this\n        // happens.\n        float mag = length(offset);\n        float maxMag = 3. * strokeWeight;\n        if (mag > maxMag) {\n          offset *= maxMag / mag;\n        }\n      } else if (sideEnum == 1.) {\n        offset = side * normalIn * strokeWeight / 2.;\n      } else if (sideEnum == 3.) {\n        offset = side * normalOut * strokeWeight / 2.;\n      }\n    }\n    if (uStrokeJoin == STROKE_JOIN_BEVEL) {\n      vec2 avgNormal = vec2(-vTangent.y, vTangent.x);\n      vMaxDist = abs(dot(avgNormal, normalIn * strokeWeight / 2.));\n    } else {\n      vMaxDist = strokeWeight / 2.;\n    }\n  } else {\n    vec2 tangent = aTangentIn == vec3(0.) ? tangentOut : tangentIn;\n    vTangent = tangent;\n    vec2 normal = vec2(-tangent.y, tangent.x);\n\n    float normalOffset = sign(aSide);\n    // Caps will have side values of -2 or 2 on the edge of the cap that\n    // extends out from the line\n    float tangentOffset = abs(aSide) - 1.;\n    offset = (normal * normalOffset + tangent * tangentOffset) *\n      strokeWeight * 0.5;\n    vMaxDist = strokeWeight / 2.;\n  }\n  vPosition = HOOK_getLinePosition(vCenter + offset);\n\n  gl_Position.xy = p.xy + offset.xy * curPerspScale;\n  gl_Position.zw = p.zw;\n  \n  vColor = HOOK_getVertexColor(uUseLineColor ? aVertexColor : uMaterialColor);\n  HOOK_afterVertex();\n}\n',
           lineFrag: lineDefs + 'precision highp int;\nprecision highp float;\n\nuniform vec4 uMaterialColor;\nuniform int uStrokeCap;\nuniform int uStrokeJoin;\n\nIN vec4 vColor;\nIN vec2 vTangent;\nIN vec2 vCenter;\nIN vec2 vPosition;\nIN float vStrokeWeight;\nIN float vMaxDist;\nIN float vCap;\nIN float vJoin;\n\nfloat distSquared(vec2 a, vec2 b) {\n  vec2 aToB = b - a;\n  return dot(aToB, aToB);\n}\n\nstruct Inputs {\n  vec4 color;\n  vec2 tangent;\n  vec2 center;\n  vec2 position;\n  float strokeWeight;\n};\n\nvoid main() {\n  HOOK_beforeFragment();\n\n  Inputs inputs;\n  inputs.color = vColor;\n  inputs.tangent = vTangent;\n  inputs.center = vCenter;\n  inputs.position = vPosition;\n  inputs.strokeWeight = vStrokeWeight;\n  inputs = HOOK_getPixelInputs(inputs);\n\n  if (vCap > 0.) {\n    if (\n      uStrokeCap == STROKE_CAP_ROUND &&\n      HOOK_shouldDiscard(distSquared(inputs.position, inputs.center) > inputs.strokeWeight * inputs.strokeWeight * 0.25)\n    ) {\n      discard;\n    } else if (\n      uStrokeCap == STROKE_CAP_SQUARE &&\n      HOOK_shouldDiscard(dot(inputs.position - inputs.center, inputs.tangent) > 0.)\n    ) {\n      discard;\n    // Use full area for PROJECT\n    } else if (HOOK_shouldDiscard(false)) {\n      discard;\n    }\n  } else if (vJoin > 0.) {\n    if (\n      uStrokeJoin == STROKE_JOIN_ROUND &&\n      HOOK_shouldDiscard(distSquared(inputs.position, inputs.center) > inputs.strokeWeight * inputs.strokeWeight * 0.25)\n    ) {\n      discard;\n    } else if (uStrokeJoin == STROKE_JOIN_BEVEL) {\n      vec2 normal = vec2(-inputs.tangent.y, inputs.tangent.x);\n      if (HOOK_shouldDiscard(abs(dot(inputs.position - inputs.center, normal)) > vMaxDist)) {\n        discard;\n      }\n    // Use full area for MITER\n    } else if (HOOK_shouldDiscard(false)) {\n      discard;\n    }\n  }\n  OUT_COLOR = HOOK_getFinalColor(vec4(inputs.color.rgb, 1.) * inputs.color.a);\n  HOOK_afterFragment();\n}\n',
-          pointVert: 'IN vec3 aPosition;\nuniform float uPointSize;\nOUT float vStrokeWeight;\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\n\nvoid main() {\n  HOOK_beforeVertex();\n  vec4 viewModelPosition = vec4(HOOK_getWorldPosition(\n    (uModelViewMatrix * vec4(HOOK_getLocalPosition(aPosition), 1.0)).xyz\n  ), 1.);\n  gl_Position = uProjectionMatrix * viewModelPosition;  \n\n  float pointSize = HOOK_getPointSize(uPointSize);\n\n\tgl_PointSize = pointSize;\n\tvStrokeWeight = pointSize;\n  HOOK_afterVertex();\n}\n',
-          pointFrag: 'precision mediump int;\nuniform vec4 uMaterialColor;\nIN float vStrokeWeight;\n\nvoid main(){\n  HOOK_beforeFragment();\n  float mask = 0.0;\n\n  // make a circular mask using the gl_PointCoord (goes from 0 - 1 on a point)\n  // might be able to get a nicer edge on big strokeweights with smoothstep but slightly less performant\n\n  mask = step(0.98, length(gl_PointCoord * 2.0 - 1.0));\n\n  // if strokeWeight is 1 or less lets just draw a square\n  // this prevents weird artifacting from carving circles when our points are really small\n  // if strokeWeight is larger than 1, we just use it as is\n\n  mask = mix(0.0, mask, clamp(floor(vStrokeWeight - 0.5),0.0,1.0));\n\n  // throw away the borders of the mask\n  // otherwise we get weird alpha blending issues\n\n  if(HOOK_shouldDiscard(mask > 0.98)){\n    discard;\n  }\n\n  OUT_COLOR = HOOK_getFinalColor(vec4(uMaterialColor.rgb, 1.) * uMaterialColor.a);\n  HOOK_afterFragment();\n}\n',
+          pointVert: 'IN vec3 aPosition;\nIN vec4 aVertexColor;\nuniform float uPointSize;\nuniform bool uUseVertexColor;\nuniform vec4 uMaterialColor;\nOUT float vStrokeWeight;\nOUT vec4 vColor;\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\n\nvoid main() {\n  HOOK_beforeVertex();\n  vec4 viewModelPosition = vec4(HOOK_getWorldPosition(\n    (uModelViewMatrix * vec4(HOOK_getLocalPosition(aPosition), 1.0)).xyz\n  ), 1.);\n  gl_Position = uProjectionMatrix * viewModelPosition;  \n\n  float pointSize = HOOK_getPointSize(uPointSize);\n\n\tgl_PointSize = pointSize;\n\tvStrokeWeight = pointSize;\n\n  // Choose per-vertex stroke color when available; otherwise use uniform stroke color\n  vec4 baseColor = uUseVertexColor ? aVertexColor : uMaterialColor;\n  vColor = HOOK_getVertexColor(baseColor);\n  HOOK_afterVertex();\n}\n',
+          pointFrag: 'precision mediump int;\nuniform vec4 uMaterialColor;\nIN float vStrokeWeight;\nIN vec4 vColor;\n\nvoid main(){\n  HOOK_beforeFragment();\n  float mask = 0.0;\n\n  // make a circular mask using the gl_PointCoord (goes from 0 - 1 on a point)\n  // might be able to get a nicer edge on big strokeweights with smoothstep but slightly less performant\n\n  mask = step(0.98, length(gl_PointCoord * 2.0 - 1.0));\n\n  // if strokeWeight is 1 or less lets just draw a square\n  // this prevents weird artifacting from carving circles when our points are really small\n  // if strokeWeight is larger than 1, we just use it as is\n\n  mask = mix(0.0, mask, clamp(floor(vStrokeWeight - 0.5),0.0,1.0));\n\n  // throw away the borders of the mask\n  // otherwise we get weird alpha blending issues\n\n  if(HOOK_shouldDiscard(mask > 0.98)){\n    discard;\n  }\n\n  // Use the interpolated vertex color (set in vertex shader)\n  vec4 baseColor = vColor;\n  OUT_COLOR = HOOK_getFinalColor(vec4(baseColor.rgb, 1.) * baseColor.a);\n  HOOK_afterFragment();\n}\n',
           imageLightVert: 'precision highp float;\nattribute vec3 aPosition;\nattribute vec3 aNormal;\nattribute vec2 aTexCoord;\n\nvarying vec3 localPos;\nvarying vec3 vWorldNormal;\nvarying vec3 vWorldPosition;\nvarying vec2 vTexCoord;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform mat3 uNormalMatrix;\n\nvoid main() {\n  // Multiply the position by the matrix.\n  vec4 viewModelPosition = uModelViewMatrix * vec4(aPosition, 1.0);\n  gl_Position = uProjectionMatrix * viewModelPosition;  \n  \n  // orient the normals and pass to the fragment shader\n  vWorldNormal = uNormalMatrix * aNormal;\n  \n  // send the view position to the fragment shader\n  vWorldPosition = (uModelViewMatrix * vec4(aPosition, 1.0)).xyz;\n  \n  localPos = vWorldPosition;\n  vTexCoord = aTexCoord;\n}\n\n\n/*\nin the vertex shader we\'ll compute the world position and world oriented normal of the vertices and pass those to the fragment shader as varyings.\n*/\n',
           imageLightDiffusedFrag: 'precision highp float;\nvarying vec3 localPos;\n\n// the HDR cubemap converted (can be from an equirectangular environment map.)\nuniform sampler2D environmentMap;\nvarying vec2 vTexCoord;\n\nconst float PI = 3.14159265359;\n\nvec2 nTOE( vec3 v ){\n  // x = r sin(phi) cos(theta)   \n  // y = r cos(phi)  \n  // z = r sin(phi) sin(theta)\n  float phi = acos( v.y );\n  // if phi is 0, then there are no x, z components\n  float theta = 0.0;\n  // else \n  theta = acos(v.x / sin(phi));\n  float sinTheta = v.z / sin(phi);\n  if (sinTheta < 0.0) {\n    // Turn it into -theta, but in the 0-2PI range\n    theta = 2.0 * PI - theta;\n  }\n  theta = theta / (2.0 * 3.14159);\n  phi = phi / 3.14159 ;\n  \n  vec2 angles = vec2( phi, theta );\n  return angles;\n}\n\nfloat random(vec2 p) {\n  vec3 p3  = fract(vec3(p.xyx) * .1031);\n  p3 += dot(p3, p3.yzx + 33.33);\n  return fract((p3.x + p3.y) * p3.z);\n}\n\nvoid main()\n{   \t \n\t// the sample direction equals the hemisphere\'s orientation\n  float phi = vTexCoord.x * 2.0 * PI;\n  float theta = vTexCoord.y * PI;\n  float x = sin(theta) * cos(phi);\n  float y = sin(theta) * sin(phi);\n  float z = cos(theta);\n  vec3 normal = vec3( x, y, z);\n\n\t// Discretely sampling the hemisphere given the integral\'s\n  // spherical coordinates translates to the following fragment code:\n\tvec3 irradiance = vec3(0.0);  \n\tvec3 up\t= vec3(0.0, 1.0, 0.0);\n\tvec3 right = normalize(cross(up, normal));\n\tup = normalize(cross(normal, right));\n\n\t//  We specify a fixed sampleDelta delta value to traverse\n  // the hemisphere; decreasing or increasing the sample delta\n  // will increase or decrease the accuracy respectively.\n\tconst float sampleDelta = 0.100;\n\tfloat nrSamples = 0.0;\n  float randomOffset = random(gl_FragCoord.xy) * sampleDelta;\n\tfor(float rawPhi = 0.0; rawPhi < 2.0 * PI; rawPhi += sampleDelta)\n\t{\n    float phi = rawPhi + randomOffset;\n    for(float rawTheta = 0.0; rawTheta < ( 0.5 ) * PI; rawTheta += sampleDelta)\n    {\n      float theta = rawTheta + randomOffset;\n      // spherical to cartesian (in tangent space) // tangent space to world // add each sample result to irradiance\n      float x = sin(theta) * cos(phi);\n      float y = sin(theta) * sin(phi);\n      float z = cos(theta);\n      vec3 tangentSample = vec3( x, y, z);\n      \n      vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * normal;\n        irradiance += (texture2D(environmentMap, nTOE(sampleVec)).xyz) * cos(theta) * sin(theta);\n      nrSamples++;\n    }\n\t}\n\t// divide by the total number of samples taken, giving us the average sampled irradiance.\n\tirradiance = PI * irradiance * (1.0 / float(nrSamples )) ;\n  \n \n\tgl_FragColor = vec4(irradiance, 1.0);\n}',
           imageLightSpecularFrag: 'precision highp float;\r\nvarying vec3 localPos;\r\nvarying vec2 vTexCoord;\r\n\r\n// our texture\r\nuniform sampler2D environmentMap;\r\nuniform float roughness;\r\n\r\nconst float PI = 3.14159265359;\r\n\r\nfloat VanDerCorput(int bits);\r\nvec2 HammersleyNoBitOps(int i, int N);\r\nvec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness);\r\n\r\n\r\nvec2 nTOE( vec3 v ){\r\n  // x = r sin(phi) cos(theta)   \r\n  // y = r cos(phi)  \r\n  // z = r sin(phi) sin(theta)\r\n  float phi = acos( v.y );\r\n  // if phi is 0, then there are no x, z components\r\n  float theta = 0.0;\r\n  // else \r\n  theta = acos(v.x / sin(phi));\r\n  float sinTheta = v.z / sin(phi);\r\n  if (sinTheta < 0.0) {\r\n    // Turn it into -theta, but in the 0-2PI range\r\n    theta = 2.0 * PI - theta;\r\n  }\r\n  theta = theta / (2.0 * 3.14159);\r\n  phi = phi / 3.14159 ;\r\n  \r\n  vec2 angles = vec2( phi, theta );\r\n  return angles;\r\n}\r\n\r\n\r\nvoid main(){\r\n  const int SAMPLE_COUNT = 400; // 4096\r\n  int lowRoughnessLimit = int(pow(2.0,(roughness+0.1)*20.0));\r\n  float totalWeight = 0.0;\r\n  vec3 prefilteredColor = vec3(0.0);\r\n  float phi = vTexCoord.x * 2.0 * PI;\r\n  float theta = vTexCoord.y * PI;\r\n  float x = sin(theta) * cos(phi);\r\n  float y = sin(theta) * sin(phi);\r\n  float z = cos(theta);\r\n  vec3 N = vec3(x,y,z);\r\n  vec3 V = N;\r\n  for (int i = 0; i < SAMPLE_COUNT; ++i)\r\n  {\r\n    // break at smaller sample numbers for low roughness levels\r\n    if(i == lowRoughnessLimit)\r\n    {\r\n      break;\r\n    }\r\n    vec2 Xi = HammersleyNoBitOps(i, SAMPLE_COUNT);\r\n    vec3 H = ImportanceSampleGGX(Xi, N, roughness);\r\n    vec3 L = normalize(2.0 * dot(V, H) * H - V);\r\n\r\n    float NdotL = max(dot(N, L), 0.0);\r\n    if (NdotL > 0.0)\r\n    {\r\n      prefilteredColor += texture2D(environmentMap, nTOE(L)).xyz * NdotL;\r\n      totalWeight += NdotL;\r\n    }\r\n  }\r\n  prefilteredColor = prefilteredColor / totalWeight;\r\n\r\n  gl_FragColor = vec4(prefilteredColor, 1.0);\r\n}\r\n\r\nvec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness){\r\n  float a = roughness * roughness;\r\n\r\n  float phi = 2.0 * PI * Xi.x;\r\n  float cosTheta = sqrt((1.0 - Xi.y) / (1.0 + (a * a - 1.0) * Xi.y));\r\n  float sinTheta = sqrt(1.0 - cosTheta * cosTheta);\r\n  // from spherical coordinates to cartesian coordinates\r\n  vec3 H;\r\n  H.x = cos(phi) * sinTheta;\r\n  H.y = sin(phi) * sinTheta;\r\n  H.z = cosTheta;\r\n\r\n  // from tangent-space vector to world-space sample vector\r\n  vec3 up = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);\r\n  vec3 tangent = normalize(cross(up, N));\r\n  vec3 bitangent = cross(N, tangent);\r\n\r\n  vec3 sampleVec = tangent * H.x + bitangent * H.y + N * H.z;\r\n  return normalize(sampleVec);\r\n}\r\n\r\n\r\nfloat VanDerCorput(int n, int base)\r\n{\r\n#ifdef WEBGL2\r\n\r\n    uint bits = uint(n);\r\n    bits = (bits << 16u) | (bits >> 16u);\r\n    bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);\r\n    bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);\r\n    bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);\r\n    bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);\r\n    return float(bits) * 2.3283064365386963e-10; // / 0x100000000\r\n\r\n#else\r\n\r\n  float invBase = 1.0 / float(base);\r\n  float denom = 1.0;\r\n  float result = 0.0;\r\n\r\n\r\n  for (int i = 0; i < 32; ++i)\r\n  {\r\n        if (n > 0)\r\n        {\r\n        denom = mod(float(n), 2.0);\r\n        result += denom * invBase;\r\n        invBase = invBase / 2.0;\r\n        n = int(float(n) / 2.0);\r\n        }\r\n  }\r\n\r\n\r\n  return result;\r\n\r\n#endif\r\n}\r\n\r\nvec2 HammersleyNoBitOps(int i, int N)\r\n{\r\n  return vec2(float(i) / float(N), VanDerCorput(i, 2));\r\n}\r\n'
@@ -141933,11 +141987,14 @@
                   new _main.default.RenderBuffer(3, 'lineTangentsOut', 'lineTangentsOutBuffer', 'aTangentOut', _assertThisInitialized(_this)),
                   new _main.default.RenderBuffer(1, 'lineSides', 'lineSidesBuffer', 'aSide', _assertThisInitialized(_this))
                 ],
-                point: _this.GL.createBuffer()
+                point: [
+                  new _main.default.RenderBuffer(3, 'vertices', 'pointVertexBuffer', 'aPosition', _assertThisInitialized(_this), _this._vToNArray),
+                  new _main.default.RenderBuffer(4, 'vertexStrokeColors', 'pointColorBuffer', 'aVertexColor', _assertThisInitialized(_this))
+                ]
               }
             };
-            _this.pointSize = 5; //default point size
             _this.curStrokeWeight = 1;
+            _this.pointSize = _this.curStrokeWeight;
             _this.curStrokeCap = constants.ROUND;
             _this.curStrokeJoin = constants.ROUND;
             // map of texture sources to textures created in this gl context via this.getTexture(src)
@@ -141975,22 +142032,218 @@
             _this.fontInfos = {
             };
             _this._curShader = undefined;
+            // Register cleanup hook to free WebGL resources when sketch is removed
+            // Only register if this is the main p5 instance (not a p5.Graphics)
+            // For p5.Graphics, cleanup is called directly from p5.Graphics.remove()
+            var isPGraphics = _this._pInst instanceof _main.default.Graphics;
+            if (!isPGraphics && _this._pInst && typeof _this._pInst.registerMethod === 'function') {
+              _this._pInst.registerMethod('remove', _this.remove.bind(_assertThisInitialized(_this)));
+            }
             return _this;
           }          /**
-    * Starts creating a new p5.Geometry. Subsequent shapes drawn will be added
-     * to the geometry and then returned when
-     * <a href="#/p5/endGeometry">endGeometry()</a> is called. One can also use
-     * <a href="#/p5/buildGeometry">buildGeometry()</a> to pass a function that
-     * draws shapes.
-     *
-     * If you need to draw complex shapes every frame which don't change over time,
-     * combining them upfront with `beginGeometry()` and `endGeometry()` and then
-     * drawing that will run faster than repeatedly drawing the individual pieces.
-     *
-     * @method beginGeometry
+   * Frees all WebGL resources (shaders, textures, buffers) associated with
+   * this renderer. Called automatically when the p5 instance is removed,
+   * or when a p5.Graphics object is removed.
+   *
+   * @method remove
+   * @private
    */
 
           _createClass(RendererGL, [
+            {
+              key: 'remove',
+              value: function remove() {
+                // Remove all cached shaders
+                var shadersToRemove = [
+                  this._defaultLightShader,
+                  this._defaultImmediateModeShader,
+                  this._defaultNormalShader,
+                  this._defaultColorShader,
+                  this._defaultPointShader,
+                  this.userFillShader,
+                  this.userStrokeShader,
+                  this.userPointShader,
+                  this._curShader,
+                  this.specularShader,
+                  this.diffusedShader,
+                  this.filterShader
+                ];
+                // Also add filter shaders
+                if (this.defaultFilterShaders) {
+                  for (var _key in this.defaultFilterShaders) {
+                    shadersToRemove.push(this.defaultFilterShaders[_key]);
+                  }
+                }                // Remove each shader
+
+                for (var _i = 0, _shadersToRemove = shadersToRemove; _i < _shadersToRemove.length; _i++) {
+                  var shader = _shadersToRemove[_i];
+                  if (shader && typeof shader.remove === 'function') {
+                    shader.remove();
+                  }
+                }                // Remove all cached textures
+
+                if (this.textures) {
+                  var _iteratorNormalCompletion = true;
+                  var _didIteratorError = false;
+                  var _iteratorError = undefined;
+                  try {
+                    for (var _iterator = this.textures.values() [Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                      var texture = _step.value;
+                      if (texture && typeof texture.remove === 'function') {
+                        texture.remove();
+                      }
+                    }
+                  } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                  } finally {
+                    try {
+                      if (!_iteratorNormalCompletion && _iterator.return != null) {
+                        _iterator.return();
+                      }
+                    } finally {
+                      if (_didIteratorError) {
+                        throw _iteratorError;
+                      }
+                    }
+                  }
+                  this.textures.clear();
+                }                // Remove all framebuffers (they have their own remove() method)
+
+                if (this.framebuffers) {
+                  var _iteratorNormalCompletion2 = true;
+                  var _didIteratorError2 = false;
+                  var _iteratorError2 = undefined;
+                  try {
+                    for (var _iterator2 = this.framebuffers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                      var fb = _step2.value;
+                      if (fb && typeof fb.remove === 'function') {
+                        fb.remove();
+                      }
+                    }
+                  } catch (err) {
+                    _didIteratorError2 = true;
+                    _iteratorError2 = err;
+                  } finally {
+                    try {
+                      if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                        _iterator2.return();
+                      }
+                    } finally {
+                      if (_didIteratorError2) {
+                        throw _iteratorError2;
+                      }
+                    }
+                  }
+                  this.framebuffers.clear();
+                }                // Clean up diffused and specular texture caches (these store framebuffers)
+
+                if (this.diffusedTextures) {
+                  var _iteratorNormalCompletion3 = true;
+                  var _didIteratorError3 = false;
+                  var _iteratorError3 = undefined;
+                  try {
+                    for (var _iterator3 = this.diffusedTextures.values() [Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                      var _fb = _step3.value;
+                      if (_fb && typeof _fb.remove === 'function') {
+                        _fb.remove();
+                      }
+                    }
+                  } catch (err) {
+                    _didIteratorError3 = true;
+                    _iteratorError3 = err;
+                  } finally {
+                    try {
+                      if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+                        _iterator3.return();
+                      }
+                    } finally {
+                      if (_didIteratorError3) {
+                        throw _iteratorError3;
+                      }
+                    }
+                  }
+                  this.diffusedTextures.clear();
+                }
+                if (this.specularTextures) {
+                  var _iteratorNormalCompletion4 = true;
+                  var _didIteratorError4 = false;
+                  var _iteratorError4 = undefined;
+                  try {
+                    for (var _iterator4 = this.specularTextures.values() [Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                      var _fb2 = _step4.value;
+                      if (_fb2 && typeof _fb2.remove === 'function') {
+                        _fb2.remove();
+                      }
+                    }
+                  } catch (err) {
+                    _didIteratorError4 = true;
+                    _iteratorError4 = err;
+                  } finally {
+                    try {
+                      if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+                        _iterator4.return();
+                      }
+                    } finally {
+                      if (_didIteratorError4) {
+                        throw _iteratorError4;
+                      }
+                    }
+                  }
+                  this.specularTextures.clear();
+                }                // Remove empty texture singleton
+
+                if (this._emptyTexture) {
+                  if (typeof this._emptyTexture.remove === 'function') {
+                    this._emptyTexture.remove();
+                  }
+                  this._emptyTexture = null;
+                }                // Free all retained mode geometry buffers
+
+                if (this.retainedMode && this.retainedMode.geometry) {
+                  for (var gId in this.retainedMode.geometry) {
+                    this._freeBuffers(gId);
+                  }
+                }                // Clean up filter layers
+
+                if (this.filterLayer && typeof this.filterLayer.remove === 'function') {
+                  this.filterLayer.remove();
+                  this.filterLayer = undefined;
+                }
+                if (this.filterLayerTemp && typeof this.filterLayerTemp.remove === 'function') {
+                  this.filterLayerTemp.remove();
+                  this.filterLayerTemp = undefined;
+                }                // Clear shader references
+
+                this._defaultLightShader = undefined;
+                this._defaultImmediateModeShader = undefined;
+                this._defaultNormalShader = undefined;
+                this._defaultColorShader = undefined;
+                this._defaultPointShader = undefined;
+                this.userFillShader = undefined;
+                this.userStrokeShader = undefined;
+                this.userPointShader = undefined;
+                this._curShader = undefined;
+                this.specularShader = undefined;
+                this.diffusedShader = undefined;
+                this.filterShader = undefined;
+                this.defaultFilterShaders = {
+                };
+              }              /**
+      * Starts creating a new p5.Geometry. Subsequent shapes drawn will be added
+       * to the geometry and then returned when
+       * <a href="#/p5/endGeometry">endGeometry()</a> is called. One can also use
+       * <a href="#/p5/buildGeometry">buildGeometry()</a> to pass a function that
+       * draws shapes.
+       *
+       * If you need to draw complex shapes every frame which don't change over time,
+       * combining them upfront with `beginGeometry()` and `endGeometry()` and then
+       * drawing that will run faster than repeatedly drawing the individual pieces.
+       *
+       * @method beginGeometry
+     */
+
+            },
             {
               key: 'beginGeometry',
               value: function beginGeometry() {
@@ -142229,6 +142482,21 @@
               key: 'background',
               value: function background() {
                 var _this$_pInst;
+                var a0 = arguments.length <= 0 ? undefined : arguments[0];
+                var isImageLike = a0 instanceof _main.default.Image || a0 instanceof _main.default.Graphics || typeof HTMLImageElement !== 'undefined' && a0 instanceof HTMLImageElement || typeof HTMLVideoElement !== 'undefined' && a0 instanceof HTMLVideoElement || typeof _main.default.MediaElement !== 'undefined' && a0 instanceof _main.default.MediaElement;
+                // WEBGL: support background(image)
+                if (arguments.length > 0 && isImageLike) {
+                  // Clear WebGL buffers (color + depth)
+                  this._pInst.clear();
+                  // Draw background image in screen space (ignore camera)
+                  this._pInst.push();
+                  this._pInst.resetMatrix();
+                  this._pInst.imageMode(this._pInst.CENTER);
+                  this._pInst.image(a0, 0, 0, this._pInst.width, this._pInst.height);
+                  this._pInst.pop();
+                  return;
+                }                // Default WEBGL background(color)
+
                 var _col = (_this$_pInst = this._pInst).color.apply(_this$_pInst, arguments);
                 var _r = _col.levels[0] / 255;
                 var _g = _col.levels[1] / 255;
@@ -142756,27 +143024,27 @@
                 if (typeof pixelsState.pixels !== 'undefined') {
                   pixelsState._setProperty('pixels', new Uint8Array(this.GL.drawingBufferWidth * this.GL.drawingBufferHeight * 4));
                 }
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
+                var _iteratorNormalCompletion5 = true;
+                var _didIteratorError5 = false;
+                var _iteratorError5 = undefined;
                 try {
-                  for (var _iterator = this.framebuffers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var framebuffer = _step.value;
+                  for (var _iterator5 = this.framebuffers[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    var framebuffer = _step5.value;
                     // Notify framebuffers of the resize so that any auto-sized framebuffers
                     // can also update their size
                     framebuffer._canvasSizeChanged();
                   }
                 } catch (err) {
-                  _didIteratorError = true;
-                  _iteratorError = err;
+                  _didIteratorError5 = true;
+                  _iteratorError5 = err;
                 } finally {
                   try {
-                    if (!_iteratorNormalCompletion && _iterator.return != null) {
-                      _iterator.return();
+                    if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+                      _iterator5.return();
                     }
                   } finally {
-                    if (_didIteratorError) {
-                      throw _iteratorError;
+                    if (_didIteratorError5) {
+                      throw _iteratorError5;
                     }
                   }
                 }
@@ -142983,8 +143251,8 @@
                 if (this._clipDepths.length > 0 && this._pushPopDepth === this._clipDepths[this._clipDepths.length - 1]) {
                   this._clearClip();
                 }
-                for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-                  args[_key] = arguments[_key];
+                for (var _len = arguments.length, args = new Array(_len), _key2 = 0; _key2 < _len; _key2++) {
+                  args[_key2] = arguments[_key2];
                 }(_get2 = _get(_getPrototypeOf(RendererGL.prototype), 'pop', this)).call.apply(_get2, [
                   this
                 ].concat(args));
@@ -143274,6 +143542,7 @@
                       'vec3 getLocalPosition': '(vec3 position) { return position; }',
                       'vec3 getWorldPosition': '(vec3 position) { return position; }',
                       'float getPointSize': '(float size) { return size; }',
+                      'vec4 getVertexColor': '(vec4 color) { return color; }',
                       'void afterVertex': '() {}'
                     },
                     fragment: {
@@ -143604,6 +143873,9 @@
                 // @todo is there an instance where this isn't stroke weight?
                 // should be they be same var?
                 pointShader.setUniform('uPointSize', this.pointSize * this._pInst._pixelDensity);
+                // Enable per-vertex color for POINTS when available
+                var useVertexColor = this.immediateMode && this.immediateMode.geometry && this.immediateMode.geometry.vertexStrokeColors && this.immediateMode.geometry.vertexStrokeColors.length > 0;
+                pointShader.setUniform('uUseVertexColor', !!useVertexColor);
               }              /* Binds a buffer to the drawing context
     * when passed more than two arguments it also updates or initializes
     * the data associated with the buffer
@@ -143731,25 +144003,25 @@
               value: function _initTessy() {
                 // function called for each vertex of tesselator output
                 function vertexCallback(data, polyVertArray) {
-                  var _iteratorNormalCompletion2 = true;
-                  var _didIteratorError2 = false;
-                  var _iteratorError2 = undefined;
+                  var _iteratorNormalCompletion6 = true;
+                  var _didIteratorError6 = false;
+                  var _iteratorError6 = undefined;
                   try {
-                    for (var _iterator2 = data[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                      var element = _step2.value;
+                    for (var _iterator6 = data[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                      var element = _step6.value;
                       polyVertArray.push(element);
                     }
                   } catch (err) {
-                    _didIteratorError2 = true;
-                    _iteratorError2 = err;
+                    _didIteratorError6 = true;
+                    _iteratorError6 = err;
                   } finally {
                     try {
-                      if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                        _iterator2.return();
+                      if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+                        _iterator6.return();
                       }
                     } finally {
-                      if (_didIteratorError2) {
-                        throw _iteratorError2;
+                      if (_didIteratorError6) {
+                        throw _iteratorError6;
                       }
                     }
                   }
@@ -143797,12 +144069,12 @@
                 // issues or bugs in libtess's automatic calculation.
                 var z = contours[0] ? contours[0][2] : undefined;
                 var allSameZ = true;
-                var _iteratorNormalCompletion3 = true;
-                var _didIteratorError3 = false;
-                var _iteratorError3 = undefined;
+                var _iteratorNormalCompletion7 = true;
+                var _didIteratorError7 = false;
+                var _iteratorError7 = undefined;
                 try {
-                  for (var _iterator3 = contours[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var contour = _step3.value;
+                  for (var _iterator7 = contours[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                    var contour = _step7.value;
                     for (var j = 0; j < contour.length; j += _main.default.RendererGL.prototype.tessyVertexSize) {
                       if (contour[j + 2] !== z) {
                         allSameZ = false;
@@ -143811,16 +144083,16 @@
                     }
                   }
                 } catch (err) {
-                  _didIteratorError3 = true;
-                  _iteratorError3 = err;
+                  _didIteratorError7 = true;
+                  _iteratorError7 = err;
                 } finally {
                   try {
-                    if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-                      _iterator3.return();
+                    if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+                      _iterator7.return();
                     }
                   } finally {
-                    if (_didIteratorError3) {
-                      throw _iteratorError3;
+                    if (_didIteratorError7) {
+                      throw _iteratorError7;
                     }
                   }
                 }
@@ -143833,12 +144105,12 @@
                 var triangleVerts = [
                 ];
                 this._tessy.gluTessBeginPolygon(triangleVerts);
-                var _iteratorNormalCompletion4 = true;
-                var _didIteratorError4 = false;
-                var _iteratorError4 = undefined;
+                var _iteratorNormalCompletion8 = true;
+                var _didIteratorError8 = false;
+                var _iteratorError8 = undefined;
                 try {
-                  for (var _iterator4 = contours[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    var _contour = _step4.value;
+                  for (var _iterator8 = contours[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                    var _contour = _step8.value;
                     this._tessy.gluTessBeginContour();
                     for (var _j = 0; _j < _contour.length; _j += _main.default.RendererGL.prototype.tessyVertexSize) {
                       var coords = _contour.slice(_j, _j + _main.default.RendererGL.prototype.tessyVertexSize);
@@ -143848,16 +144120,16 @@
                   }                  // finish polygon
 
                 } catch (err) {
-                  _didIteratorError4 = true;
-                  _iteratorError4 = err;
+                  _didIteratorError8 = true;
+                  _iteratorError8 = err;
                 } finally {
                   try {
-                    if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-                      _iterator4.return();
+                    if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
+                      _iterator8.return();
                     }
                   } finally {
-                    if (_didIteratorError4) {
-                      throw _iteratorError4;
+                    if (_didIteratorError8) {
+                      throw _iteratorError8;
                     }
                   }
                 }
@@ -145596,6 +145868,52 @@
                     }
                   }
                 }
+              }              /**
+     * Frees the GPU resources associated with this shader.
+     *
+     * This method deletes the vertex shader, fragment shader, and shader program
+     * from GPU memory. Call this when you no longer need the shader to prevent
+     * memory leaks, especially when creating and destroying multiple p5 instances.
+     *
+     * @method remove
+     * @private
+     */
+
+            },
+            {
+              key: 'remove',
+              value: function remove() {
+                if (this._glProgram === 0) {
+                  return; // Already removed or never initialized
+                }
+                var gl = this._renderer.GL;
+                // Unbind if currently bound
+                if (this._bound) {
+                  this.unbindShader();
+                }                // Detach shaders from program before deletion
+
+                if (this._vertShader !== - 1) {
+                  gl.detachShader(this._glProgram, this._vertShader);
+                  gl.deleteShader(this._vertShader);
+                  this._vertShader = - 1;
+                }
+                if (this._fragShader !== - 1) {
+                  gl.detachShader(this._glProgram, this._fragShader);
+                  gl.deleteShader(this._fragShader);
+                  this._fragShader = - 1;
+                }                // Delete the program
+
+                gl.deleteProgram(this._glProgram);
+                this._glProgram = 0;
+                // Clear cached data
+                this._loadedAttributes = false;
+                this._loadedUniforms = false;
+                this.attributes = {
+                };
+                this.uniforms = {
+                };
+                this.samplers = [
+                ];
               }
             }
           ]);
@@ -146228,6 +146546,27 @@
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this.glWrapS);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this.glWrapT);
                 this.unbindTexture();
+              }              /**
+     * Frees the GPU resources associated with this texture.
+     *
+     * This method deletes the WebGL texture from GPU memory. Call this when
+     * you no longer need the texture to prevent memory leaks.
+     *
+     * @method remove
+     * @private
+     */
+
+            },
+            {
+              key: 'remove',
+              value: function remove() {
+                // FramebufferTextures are managed by their parent Framebuffer
+                if (this.isFramebufferTexture || this.glTex === undefined) {
+                  return;
+                }
+                var gl = this._renderer.GL;
+                gl.deleteTexture(this.glTex);
+                this.glTex = undefined;
               }
             }
           ]);
@@ -147161,7 +147500,7 @@
             return; // don't render lines beyond our maxY position
           }
           if (!this._isOpenType()) {
-            console.log('WEBGL: only Opentype (.otf) and Truetype (.ttf) fonts are supported');
+            console.log('WEBGL: only Opentype (.otf) and Truetype (.ttf) fonts are supported. Make sure to set the font using textFont() before drawing text.');
             return p;
           }
           p.push(); // fix to #803
